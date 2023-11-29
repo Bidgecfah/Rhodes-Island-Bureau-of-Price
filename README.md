@@ -20,6 +20,16 @@
 因此在计算之前就应该按照博士自身的情况指定一套价值观，然后再开始计算。
 当然，对于选择困难的博士，该项目也准备了一套后期符合一般玩家经济水平、折算理智最优策略的价值观作为默认输入，供大家参考。
 
+## 文件、资料和数据源
+特别感谢：
+
+企鹅物流 https://penguin-stats.cn/ https://penguin-stats.io/
+
+ArknightsGameData https://github.com/Kengxxiao/ArknightsGameData
+
+ArknightsGameResource https://github.com/yuanyan3060/ArknightsGameResource/
+
+
 ## 页面截图
 ![image](https://github.com/Bidgecfah/-/assets/112526130/02668712-eea8-45c1-96d1-a66805f9c452)
 ![image](https://github.com/Bidgecfah/-/assets/112526130/5919e840-9d17-4bbd-9316-99b15ba259e0)
