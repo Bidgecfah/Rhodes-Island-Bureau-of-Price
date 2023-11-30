@@ -29,6 +29,10 @@ ArknightsGameData https://github.com/Kengxxiao/ArknightsGameData
 
 ArknightsGameResource https://github.com/yuanyan3060/ArknightsGameResource/
 
+## 联系方式
+QQ群：罗德岛-教捐位面 群号：984588903
+
+Bilibili：https://space.bilibili.com/2268014
 
 ## 页面截图
 ![image](https://github.com/Bidgecfah/-/assets/112526130/02668712-eea8-45c1-96d1-a66805f9c452)
