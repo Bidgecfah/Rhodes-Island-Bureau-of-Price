@@ -278,10 +278,16 @@ def 计算工序():
     界面.Label(信用性价比域, image=信用图标).grid(row=0, column=0, padx=10, pady=3)
     界面.Label(信用性价比域, text="材料名称").grid(row=0, column=1, padx=10, pady=3)
     界面.Label(信用性价比域, text="性价比").grid(row=0, column=2, padx=10, pady=3)
+    shop_dict = {}
     for 序号 in range(len(信用性价比表[4])):
+        shop_dict[信用性价比表[1][信用性价比表[4].index(序号+1)]] = format(100 * [num / max(信用性价比表[3]) for num in 信用性价比表[3]][信用性价比表[4].index(序号+1)], '.2f')
         界面.Label(信用性价比域, image=信用性价比表[0][信用性价比表[4].index(序号+1)]).grid(row=序号+1, column=0, padx=10, pady=2)
         界面.Label(信用性价比域, text=信用性价比表[1][信用性价比表[4].index(序号+1)], foreground=名称颜色[信用性价比表[2][信用性价比表[4].index(序号+1)]]).grid(row=序号+1, column=1, padx=10, pady=2)
         界面.Label(信用性价比域, text=format(100 * [num / max(信用性价比表[3]) for num in 信用性价比表[3]][信用性价比表[4].index(序号+1)], '.2f')).grid(row=序号+1, column=2, padx=10, pady=2)
+
+    with open('shop.json', 'w', newline="") as f:
+        f.write(json.dumps(shop_dict, ensure_ascii=False, indent=4))
+
 
     行 = 0
     for 阶段 in range(3):
