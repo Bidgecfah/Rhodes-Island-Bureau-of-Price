@@ -96,23 +96,23 @@ def 计算工序():
             价值输入[0].insert(0, '请输入合适的数学计算式！')
             return
     龙门币价值 = eval(龙门币价值输入字符串.replace('（', '(').replace('）', ')').replace('【', '[').replace('】', ']'))
-    经验价值输入字符串 = 价值输入[1].get()
-    for 字符 in 经验价值输入字符串:
+    EXP价值输入字符串 = 价值输入[1].get()
+    for 字符 in EXP价值输入字符串:
         if 字符 not in '0123456789.+-*/()（）[]【】龙门币价值':
             价值输入[1].delete(0, 界面.END)
             价值输入[1].insert(0, '请输入合适的数学计算式！')
             return
-    经验价值 = eval(经验价值输入字符串.replace('（', '(').replace('）', ')').replace('【', '[').replace('】', ']'))
+    EXP价值 = eval(EXP价值输入字符串.replace('（', '(').replace('）', ')').replace('【', '[').replace('】', ']'))
     赤金价值输入字符串 = 价值输入[2].get()
     for 字符 in 赤金价值输入字符串:
-        if 字符 not in '0123456789.+-*/()（）[]【】龙门币经验价值':
+        if 字符 not in '0123456789.+-*/()（）[]【】龙门币EXP价值':
             价值输入[0].delete(0, 界面.END)
             价值输入[0].insert(0, '请输入合适的数学计算式！')
             return
     赤金价值 = eval(赤金价值输入字符串.replace('（', '(').replace('）', ')').replace('【', '[').replace('】', ']'))
     合成玉价值输入字符串 = 价值输入[3].get()
     for 字符 in 合成玉价值输入字符串:
-        if 字符 not in '0123456789.+-*/()（）[]【】龙门币经验赤金价值':
+        if 字符 not in '0123456789.+-*/()（）[]【】龙门币EXP赤金价值':
             价值输入[0].delete(0, 界面.END)
             价值输入[0].insert(0, '请输入合适的数学计算式！')
             return
@@ -122,7 +122,7 @@ def 计算工序():
     for 序号 in range(7):
         价值输入字符串.append(价值输入[序号+4].get())
         for 字符 in 价值输入字符串[序号]:
-            if 字符 not in '0123456789.+-*/()（）[]【】龙门币经验赤金合成玉价值':
+            if 字符 not in '0123456789.+-*/()（）[]【】龙门币EXP赤金合成玉价值':
                 价值输入[序号+4].delete(0, 界面.END)
                 价值输入[序号+4].insert(0, '请输入合适的数学计算式！')
                 return
@@ -210,26 +210,29 @@ def 计算工序():
 
     基备选集合 = 关卡范围.get()
     换算活动代币 = 活动代币.get()
-    瑕光加工T5精英材料 = 瑕光[0].get
-    瑕光加工T4精英材料 = 瑕光[1].get
-    瑕光加工T3精英材料 = 瑕光[2].get
-    瑕光加工T2精英材料 = 瑕光[3].get
+    固源岩单独定价 = 以固源岩为原料.get()
+    装置单独定价 = 以装置为原料.get()
+    瑕光加工T5精英材料 = 瑕光[0].get()
+    瑕光加工T4精英材料 = 瑕光[1].get()
+    瑕光加工T3精英材料 = 瑕光[2].get()
+    瑕光加工T2精英材料 = 瑕光[3].get()
     九色鹿加工T3精英材料 = 加工T3精英材料使用九色鹿获取因果.get()
     九色鹿加工T2精英材料 = 加工T2精英材料使用九色鹿获取因果.get()
     九色鹿加工技巧概要 = 加工技巧概要使用九色鹿获取因果.get()
     九色鹿加工基建材料 = 加工基建材料使用九色鹿获取因果.get()
 
     输入 = [
-        龙门币价值, 经验价值, 赤金价值, 合成玉价值, 价值, 副产品产出概率, 技巧概要副产品产出概率, 基建材料副产品产出概率,
-        基备选集合, 换算活动代币, 瑕光加工T5精英材料, 瑕光加工T4精英材料, 瑕光加工T3精英材料, 瑕光加工T2精英材料,
+        龙门币价值, EXP价值, 赤金价值, 合成玉价值, 价值, 副产品产出概率, 技巧概要副产品产出概率, 基建材料副产品产出概率,
+        基备选集合, 换算活动代币, 固源岩单独定价, 装置单独定价,
+        瑕光加工T5精英材料, 瑕光加工T4精英材料, 瑕光加工T3精英材料, 瑕光加工T2精英材料,
         九色鹿加工T3精英材料, 九色鹿加工T2精英材料, 九色鹿加工技巧概要, 九色鹿加工基建材料
     ]
 
-    try:
-        定价关卡列表, 精英材料价值排序表, 精英材料价值向量, 信用性价比表, 资质凭证性价比表, 高级凭证性价比表, 寻访参数模型性价比表, 情报凭证性价比表 = 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 精英材料图片列表, 其他物品信息列表)
-    except:
-        提示.configure(text='计算失败，请检查输入内容的合理性！', foreground='red')
-        return
+    # try:
+    定价关卡列表, 精英材料价值排序表, 精英材料价值向量, 信用性价比表, 资质凭证性价比表, 高级凭证性价比表, 寻访参数模型性价比表, 情报凭证性价比表 = 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 精英材料图片列表, 其他物品信息列表)
+    # except:
+    #     提示.configure(text='计算失败，请检查输入内容的合理性！', foreground='red')
+    #     return
 
     # 界面输出
     for 等级 in range(5):
@@ -247,13 +250,21 @@ def 计算工序():
     界面.Label(定价关卡域, text="定价关卡").grid(row=0, column=3, padx=10, pady=3)
 
     游戏关卡数据 = json.load(open('游戏关卡数据.json'))
-    for 序号, 材料名 in enumerate(精英材料名列表[2]):
+    定价材料列表 = 精英材料名列表[2].copy()
+    if 装置单独定价: 定价材料列表.append('装置')
+    if 固源岩单独定价: 定价材料列表.append('固源岩')
+    for 序号, 材料名 in enumerate(定价材料列表):
+        等级 = 3
+        等级内序号 = 序号
+        if 材料名 == '固源岩' or 材料名 == '装置':
+            等级 = 2
+            等级内序号 = 精英材料名列表[1].index(材料名)
         if 定价关卡列表[序号].endswith('_perm'): 关卡代码 = 游戏关卡数据['stages'][定价关卡列表[序号][:-5]]['code'] + ' 常驻'
         elif 定价关卡列表[序号].endswith('_rep'): 关卡代码 = 游戏关卡数据['stages'][定价关卡列表[序号][:-4]]['code'] + ' 复刻'
         else: 关卡代码 = 游戏关卡数据['stages'][定价关卡列表[序号]]['code']
-        界面.Label(定价关卡域, image=精英材料图片列表[2][序号]).grid(row=序号+1, column=0, padx=10, pady=2)
-        界面.Label(定价关卡域, text=材料名, foreground=名称颜色[2]).grid(row=序号+1, column=1, padx=10, pady=2)
-        界面.Label(定价关卡域, text=format(精英材料价值向量[2][序号], '.2f')).grid(row=序号+1, column=2, padx=10, pady=2)
+        界面.Label(定价关卡域, image=精英材料图片列表[等级-1][等级内序号]).grid(row=序号+1, column=0, padx=10, pady=2)
+        界面.Label(定价关卡域, text=材料名, foreground=名称颜色[等级-1]).grid(row=序号+1, column=1, padx=10, pady=2)
+        界面.Label(定价关卡域, text=format(精英材料价值向量[等级-1][等级内序号], '.2f')).grid(row=序号+1, column=2, padx=10, pady=2)
         界面.Label(定价关卡域, text=关卡代码).grid(row=序号+1, column=3, padx=10, pady=2)
 
     with open('材料理智定价.csv', 'w', newline="") as 材料理智定价文件:
@@ -278,16 +289,10 @@ def 计算工序():
     界面.Label(信用性价比域, image=信用图标).grid(row=0, column=0, padx=10, pady=3)
     界面.Label(信用性价比域, text="材料名称").grid(row=0, column=1, padx=10, pady=3)
     界面.Label(信用性价比域, text="性价比").grid(row=0, column=2, padx=10, pady=3)
-    shop_dict = {}
     for 序号 in range(len(信用性价比表[4])):
-        shop_dict[信用性价比表[1][信用性价比表[4].index(序号+1)]] = format(100 * [num / max(信用性价比表[3]) for num in 信用性价比表[3]][信用性价比表[4].index(序号+1)], '.2f')
         界面.Label(信用性价比域, image=信用性价比表[0][信用性价比表[4].index(序号+1)]).grid(row=序号+1, column=0, padx=10, pady=2)
         界面.Label(信用性价比域, text=信用性价比表[1][信用性价比表[4].index(序号+1)], foreground=名称颜色[信用性价比表[2][信用性价比表[4].index(序号+1)]]).grid(row=序号+1, column=1, padx=10, pady=2)
         界面.Label(信用性价比域, text=format(100 * [num / max(信用性价比表[3]) for num in 信用性价比表[3]][信用性价比表[4].index(序号+1)], '.2f')).grid(row=序号+1, column=2, padx=10, pady=2)
-
-    with open('shop.json', 'w', newline="") as f:
-        f.write(json.dumps(shop_dict, ensure_ascii=False, indent=4))
-
 
     行 = 0
     for 阶段 in range(3):
@@ -367,23 +372,24 @@ for 序号 in range(3):
 # 价值观域
 价值观域 = 界面.LabelFrame(滚动区域[0], text="价值观基础", relief=界面.RIDGE, borderwidth=10)
 价值观域.grid(row=0, column=0, sticky=界面.W+E+N+S, padx=10, pady=10)
-价值输入列表 = ['龙门币', '经验', '赤金', '合成玉', '寻访凭证', '中坚寻访凭证', '芯片助剂', '模组数据块', '招聘许可', '加急许可', '家具零件']
+价值输入列表 = ['龙门币', 'EXP', '赤金', '合成玉', '寻访凭证', '中坚寻访凭证', '芯片助剂', '模组数据块', '招聘许可', '加急许可', '家具零件']
 价值输入 = []
 物品图片 = []
 for 序号, 物品 in enumerate(价值输入列表):
     行 = 序号
     if 序号 > 2: 行 += 9
+    if 序号 > 5: 行 += 3
     物品原图片 = Image.open(f'图片/{物品}.png')
     宽 = 40 * 物品原图片.size[0] // 物品原图片.size[1]
     物品图片.append(ImageTk.PhotoImage(Image.open(f'图片/{物品}.png').resize((宽, 40))))
-    界面.Label(价值观域, image=物品图片[序号]).grid(row=行, pady=5, column=0, sticky=界面.E)
-    界面.Label(价值观域, text=f"{物品}价值").grid(row=行, pady=5, column=1, padx=10, sticky=界面.W)
+    界面.Label(价值观域, image=物品图片[序号]).grid(row=行, pady=4, column=0, sticky=界面.E)
+    界面.Label(价值观域, text=f"{物品}价值").grid(row=行, pady=4, column=1, padx=10, sticky=界面.W)
     价值输入.append(界面.Entry(价值观域, justify=RIGHT))
-    价值输入[序号].grid(row=行, pady=5, column=2)
-    界面.Label(价值观域, text="理智").grid(row=行, padx=5, pady=5, column=3, sticky=界面.W)
+    价值输入[序号].grid(row=行, pady=4, column=2)
+    界面.Label(价值观域, text="理智").grid(row=行, padx=5, pady=4, column=3, sticky=界面.W)
 价值输入[0].insert(0, '36/10000')
 价值输入[1].insert(0, '龙门币价值/1.2468')
-价值输入[2].insert(0, '经验价值*2*1000/5')
+价值输入[2].insert(0, 'EXP价值*2*1000/5')
 价值输入[3].insert(0, '135/180')
 价值输入[4].insert(0, '合成玉价值*600')
 价值输入[5].insert(0, '合成玉价值*600')
@@ -394,14 +400,25 @@ for 序号, 物品 in enumerate(价值输入列表):
 价值输入[10].insert(0, '0')
 界面.Separator(价值观域, bootstyle="light").grid(row=3, column=0, columnspan=5, pady=5, sticky=界面.W+E)
 关卡范围 = 界面.StringVar(value='全部历史关卡')
-界面.Label(价值观域, text='关卡范围').grid(row=4, pady=5, column=1, padx=10, sticky=界面.E)
-界面.Radiobutton(价值观域, text='全部历史关卡', variable=关卡范围, value='全部历史关卡').grid(row=4, pady=5, column=2, sticky=界面.W)
-界面.Radiobutton(价值观域, text='当前开放关卡', variable=关卡范围, value='当前开放关卡').grid(row=5, pady=5, column=2, sticky=界面.W)
-界面.Radiobutton(价值观域, text='常驻关卡', variable=关卡范围, value='常驻关卡').grid(row=6, pady=5, column=2, sticky=界面.W)
-界面.Label(价值观域, text='活动代币换算无限龙门币').grid(row=7, column=2, columnspan=2, ipadx=60, pady=10, sticky=界面.E)
+界面.Label(价值观域, text='关卡范围').grid(row=4, pady=4, column=1, padx=10, sticky=界面.E)
+界面.Radiobutton(价值观域, text='全部历史关卡', variable=关卡范围, value='全部历史关卡').grid(row=4, pady=4, column=2, sticky=界面.W)
+界面.Radiobutton(价值观域, text='当前开放关卡', variable=关卡范围, value='当前开放关卡').grid(row=5, pady=4, column=2, sticky=界面.W)
+界面.Radiobutton(价值观域, text='常驻关卡', variable=关卡范围, value='常驻关卡').grid(row=6, pady=4, column=2, sticky=界面.W)
+界面.Label(价值观域, text='活动代币换算无限龙门币').grid(row=7, column=2, columnspan=2, ipadx=60, pady=5, sticky=界面.E)
 活动代币 = 界面.BooleanVar(value=TRUE)
 界面.Checkbutton(价值观域, bootstyle="round-toggle", variable=活动代币, onvalue=TRUE, offvalue=FALSE).grid(row=7, column=1, pady=10, sticky=界面.E)
 界面.Separator(价值观域, bootstyle="light").grid(row=8, column=0, columnspan=3, pady=5, sticky=界面.W+E)
+源石碎片图标 = ImageTk.PhotoImage(Image.open(f'图片/源石碎片.png').resize((40, 40)))
+界面.Label(价值观域, image=源石碎片图标).grid(row=15, pady=1, column=0, sticky=界面.E)
+界面.Label(价值观域, text="制造源石材料").grid(row=15, column=1, columnspan=2, ipadx=103, pady=5, sticky=界面.W)
+以固源岩为原料 = 界面.BooleanVar(value=TRUE)
+界面.Checkbutton(价值观域, text="以固源岩为原料", variable=以固源岩为原料, onvalue=TRUE, offvalue=FALSE).grid(row=15, pady=5, column=2, padx=5, sticky=界面.W)
+固源岩图标 = ImageTk.PhotoImage(Image.open(f'图片/MTL_SL_G2.png').resize((40, 40)))
+界面.Label(价值观域, image=固源岩图标).grid(row=15, pady=5, column=2, padx=40, sticky=界面.E)
+以装置为原料 = 界面.BooleanVar(value=TRUE)
+界面.Checkbutton(价值观域, text="以装置为原料", variable=以装置为原料, onvalue=TRUE, offvalue=FALSE).grid(row=16, pady=5, column=2, padx=5, sticky=界面.W)
+装置图标 = ImageTk.PhotoImage(Image.open(f'图片/MTL_SL_BOSS2.png').resize((40, 40)))
+界面.Label(价值观域, image=装置图标).grid(row=16, pady=5, column=2, padx=40, sticky=界面.E)
 
 # 副产品策略域
 副产品策略域 = 界面.LabelFrame(滚动区域[0], text="加工副产品策略", relief=界面.RIDGE, borderwidth=10)
@@ -464,7 +481,7 @@ for 序号 in range(4):
 界面.Checkbutton(副产品策略域, text='加工基建材料', variable=加工基建材料使用九色鹿获取因果, onvalue=TRUE, offvalue=FALSE).grid(row=24, pady=5, column=3, padx=5, sticky=界面.W)
 
 # 定价关卡域
-定价关卡域 = 界面.LabelFrame(滚动区域[0], text="T3精英材料关卡理智定价表", relief=界面.RIDGE, bootstyle="info", borderwidth=10)
+定价关卡域 = 界面.LabelFrame(滚动区域[0], text="精英材料关卡理智定价表", relief=界面.RIDGE, bootstyle="info", borderwidth=10)
 定价关卡域.grid(row=0, rowspan=4, column=3, columnspan=2, sticky=界面.W+E+N+S, padx=10, pady=10)
 
 界面.Button(滚动区域[0], text="开 始 计 算", bootstyle=(SECONDARY), command=计算工序).grid(row=1, rowspan=3, column=0, padx=10, ipadx=200, ipady=20, sticky=界面.W + E + N + S)
