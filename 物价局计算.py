@@ -1,7 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 import json
 import numpy
+import re
+import requests
 import time
+from bs4 import BeautifulSoup
 
 
 def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 精英材料图片列表, 其他物品信息列表):
@@ -31,6 +34,22 @@ def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 
     游戏关卡数据 = json.load(open('游戏关卡数据.json'))
     采购价格数据 = json.load(open('采购价格.json', encoding="utf-8"))
     企鹅物流自动掉落数据 = json.load(open('企鹅物流自动掉落数据.json'))
+    PRTS首页 = "https://prts.wiki/w/首页"
+    B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
+    活动名称 = "当前无活动"
+    for b in B:
+        if "「" in b.text:
+            活动名称 = re.findall(r'\「(.*?)\」', b.text)[0]
+            break
+    PRTS活动网址 = "https://prts.wiki/w/" + 活动名称
+
+    # 找到含有指定字符串的表格
+    商店表格 = None
+    全部表格 = BeautifulSoup(requests.get(PRTS活动网址).text, "html.parser").find_all("table")
+    for 表格 in 全部表格:
+        if "可兑换道具" in 表格.text:
+            商店表格 = 表格
+            break
 
     # 按照配方构筑加工矩阵
     # 加工T5获得T5精英材料矩阵 = numpy.eye(len(精英材料编号列表[4]))
@@ -140,11 +159,17 @@ def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 
                     and not 游戏关卡数据['stages'][关卡]['apCost'] == 0):
                 主线关卡信息列表[0].append(关卡)
                 主线关卡信息列表[1].append(游戏关卡数据['stages'][关卡]['apCost'])
-                主线关卡信息列表[2].append(游戏关卡数据['stages'][关卡]['goldGain'] * 1.2)
+                # 主线关卡信息列表[2].append(游戏关卡数据['stages'][关卡]['goldGain'] * 1.2)
+                折算产出龙门币 = 游戏关卡数据['stages'][关卡]['goldGain'] * 1.2
+                if 换算活动代币: 折算产出龙门币 += 游戏关卡数据['stages'][关卡]['apCost'] * 10
+                主线关卡信息列表[2].append(折算产出龙门币)
             if 游戏关卡数据['stages'][关卡]['zoneId'] == 'weekly_6':
                 技巧概要关卡信息列表[0].append(关卡)
                 技巧概要关卡信息列表[1].append(游戏关卡数据['stages'][关卡]['apCost'])
-                技巧概要关卡信息列表[2].append(游戏关卡数据['stages'][关卡]['goldGain'] * 1.2)
+                # 技巧概要关卡信息列表[2].append(游戏关卡数据['stages'][关卡]['goldGain'] * 1.2)
+                折算产出龙门币 = 游戏关卡数据['stages'][关卡]['goldGain'] * 1.2
+                if 换算活动代币: 折算产出龙门币 += 游戏关卡数据['stages'][关卡]['apCost'] * 10
+                技巧概要关卡信息列表[2].append(折算产出龙门币)
                 技巧概要关卡信息列表[3].append(0)
                 技巧概要关卡信息列表[4].append(0)
                 技巧概要关卡信息列表[5].append(0)
@@ -506,4 +531,50 @@ def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 
             情报凭证性价比表[3].append(numpy.hstack((T4精英材料价值向量, 其他物品信息列表[3]))[序号] / eval(采购价格数据["情报凭证"][材料名]) + 序号 * 1e-8)  # 性价比
     情报凭证性价比表[4] = [{序号: i+1 for i, 序号 in enumerate(sorted(情报凭证性价比表[3], reverse=True))}[序号] for 序号 in 情报凭证性价比表[3]]  # 性价比排名
 
-    return 定价关卡列表, 精英材料价值排序表, 精英材料价值向量, 信用性价比表, 资质凭证性价比表, 高级凭证性价比表, 寻访参数模型性价比表, 情报凭证性价比表
+    # 如果找到目标表格
+    活动商店 = {}
+    if 商店表格:
+        # 提取表头
+        表头 = [header.text.strip() for header in 商店表格.find_all("th")]
+        阶段 = ""
+        # 提取表格数据
+        for 行 in 商店表格.find_all("tr"):
+            行数据 = {}
+            格数据 = 行.find_all(["th", "td"])
+            for i in range(len(表头)):
+                行数据[表头[i]] = 格数据[i].text.strip() if i < len(格数据) else ""
+            if 行数据:
+                if 行数据[""] == "金色阶段":
+                    阶段 = "金色阶段"
+                    活动商店[阶段] = {}
+                elif 行数据[""] == "紫色阶段":
+                    阶段 = "紫色阶段"
+                    活动商店[阶段] = {}
+                elif 行数据[""] == "灰色阶段":
+                    阶段 = "灰色阶段"
+                    活动商店[阶段] = {}
+                可兑换道具分割 = 行数据["可兑换道具"].split("×")
+                if 可兑换道具分割[0] in 精英材料名列表[1]+精英材料名列表[2]+精英材料名列表[3]+精英材料名列表[4]+其他物品信息列表[1]:
+                    if len(可兑换道具分割) == 1:
+                        活动商店[阶段][行数据["可兑换道具"]] = str(行数据["单价"])
+                    elif len(可兑换道具分割) == 2:
+                        活动商店[阶段][可兑换道具分割[0]] = str(行数据["单价"]) + "/" + 可兑换道具分割[1]
+        with open("活动商店数据.json", "w", encoding="utf-8") as jsonfile:
+            json.dump(活动商店, jsonfile, ensure_ascii=False, indent=4)
+
+    活动代币性价比表 = []
+    for 阶段序号, 活动商店阶段 in enumerate(活动商店.keys()):
+        活动代币性价比表.append([[], [], [], [], []])
+        for 材料序号, 材料名 in enumerate(精英材料名列表[1]+精英材料名列表[2]+精英材料名列表[3]+精英材料名列表[4]+其他物品信息列表[1]):
+            if 材料名 in 活动商店[活动商店阶段].keys():
+                活动代币性价比表[阶段序号][0].append((精英材料图片列表[1]+精英材料图片列表[2]+精英材料图片列表[3]+精英材料图片列表[4]+其他物品信息列表[0])[材料序号])   # 图片
+                活动代币性价比表[阶段序号][1].append(材料名)   # 材料名
+                if 材料名 in 精英材料名列表[1]: 活动代币性价比表[阶段序号][2].append(1)   # 材料等级
+                elif 材料名 in 精英材料名列表[2]: 活动代币性价比表[阶段序号][2].append(2)
+                elif 材料名 in 精英材料名列表[3]: 活动代币性价比表[阶段序号][2].append(3)
+                elif 材料名 in 精英材料名列表[4]: 活动代币性价比表[阶段序号][2].append(4)
+                else: 活动代币性价比表[阶段序号][2].append(其他物品信息列表[2][材料序号-len(精英材料图片列表[1]+精英材料图片列表[2]+精英材料图片列表[3]+精英材料图片列表[4])])
+                活动代币性价比表[阶段序号][3].append(numpy.hstack((T2精英材料价值向量, T3精英材料价值向量, T4精英材料价值向量, T5精英材料价值向量, 其他物品信息列表[3]))[材料序号] / eval(活动商店[活动商店阶段][材料名]) + 材料序号 * 1e-8)  # 性价比
+                活动代币性价比表[阶段序号][4] = [{序号: i+1 for i, 序号 in enumerate(sorted(活动代币性价比表[阶段序号][3], reverse=True))}[序号] for 序号 in 活动代币性价比表[阶段序号][3]]  # 性价比排名
+
+    return 定价关卡列表, 精英材料价值排序表, 精英材料价值向量, 信用性价比表, 资质凭证性价比表, 高级凭证性价比表, 寻访参数模型性价比表, 情报凭证性价比表, 活动代币性价比表
