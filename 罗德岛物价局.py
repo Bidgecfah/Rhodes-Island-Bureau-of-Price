@@ -3,8 +3,10 @@ import csv
 import json
 import numpy
 from PIL import Image, ImageTk
+import re
 import requests
 import ttkbootstrap as 界面
+from bs4 import BeautifulSoup
 from ttkbootstrap.constants import *
 from ttkbootstrap.scrolled import ScrolledFrame
 from 物价局计算 import 材料定价计算
@@ -210,8 +212,8 @@ def 计算工序():
 
     基备选集合 = 关卡范围.get()
     换算活动代币 = 活动代币.get()
-    固源岩单独定价 = 以固源岩为原料.get()
-    装置单独定价 = 以装置为原料.get()
+    固源岩单独定价 = 不加工固源岩.get()
+    装置单独定价 = 不加工装置.get()
     瑕光加工T5精英材料 = 瑕光[0].get()
     瑕光加工T4精英材料 = 瑕光[1].get()
     瑕光加工T3精英材料 = 瑕光[2].get()
@@ -229,7 +231,7 @@ def 计算工序():
     ]
 
     # try:
-    定价关卡列表, 精英材料价值排序表, 精英材料价值向量, 信用性价比表, 资质凭证性价比表, 高级凭证性价比表, 寻访参数模型性价比表, 情报凭证性价比表 = 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 精英材料图片列表, 其他物品信息列表)
+    定价关卡列表, 精英材料价值排序表, 精英材料价值向量, 信用性价比表, 资质凭证性价比表, 高级凭证性价比表, 寻访参数模型性价比表, 情报凭证性价比表, 活动代币性价比表 = 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 精英材料图片列表, 其他物品信息列表)
     # except:
     #     提示.configure(text='计算失败，请检查输入内容的合理性！', foreground='red')
     #     return
@@ -243,6 +245,7 @@ def 计算工序():
     for 子控件 in 高级凭证性价比域.winfo_children(): 子控件.destroy()
     for 子控件 in 寻访参数模型性价比域.winfo_children(): 子控件.destroy()
     for 子控件 in 情报凭证性价比域.winfo_children(): 子控件.destroy()
+    for 子控件 in 活动代币性价比域.winfo_children(): 子控件.destroy()
     for 子控件 in 定价关卡域.winfo_children(): 子控件.destroy()
     界面.Label(定价关卡域, image=理智图标).grid(row=0, column=0, padx=10, pady=3)
     界面.Label(定价关卡域, text="材料名称").grid(row=0, column=1, padx=10, pady=3)
@@ -333,12 +336,37 @@ def 计算工序():
         界面.Label(情报凭证性价比域, text=情报凭证性价比表[1][情报凭证性价比表[4].index(序号+1)], foreground=名称颜色[情报凭证性价比表[2][情报凭证性价比表[4].index(序号+1)]]).grid(row=序号+1, column=1, padx=10, pady=2)
         界面.Label(情报凭证性价比域, text=format(100 * [num / max(情报凭证性价比表[3]) for num in 情报凭证性价比表[3]][情报凭证性价比表[4].index(序号+1)], '.2f')).grid(row=序号+1, column=2, padx=10, pady=2)
 
+    PRTS首页 = "https://prts.wiki/w/首页"
+    B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
+    活动名称 = "当前无活动"
+    for b in B:
+        if "「" in b.text:
+            活动名称 = "「" + re.findall(r'\「(.*?)\」', b.text)[0] + "」"
+            break
+    if 活动名称 != "当前无活动":
+        活动商店价格数据 = json.load(open('活动商店数据.json', encoding="utf-8"))
+        活动代币性价比域.grid(row=0, column=0, sticky=界面.W+E+N+S, pady=10, padx=10)
+        行 = 0
+        界面.Label(活动代币性价比域, text=活动名称).grid(row=行, column=0, padx=10, pady=3)
+        界面.Label(活动代币性价比域, text="材料名称").grid(row=行, column=1, padx=10, pady=3)
+        界面.Label(活动代币性价比域, text="性价比").grid(row=行, column=2, padx=10, pady=3)
+        for 阶段序号, 阶段 in enumerate(活动商店价格数据.keys()):
+            行 += 1
+            for 序号 in range(len(活动代币性价比表[阶段序号][4])):
+                界面.Label(活动代币性价比域, image=活动代币性价比表[阶段序号][0][活动代币性价比表[阶段序号][4].index(序号+1)]).grid(row=行, column=0, padx=10, pady=2)
+                界面.Label(活动代币性价比域, text=活动代币性价比表[阶段序号][1][活动代币性价比表[阶段序号][4].index(序号+1)], foreground=名称颜色[活动代币性价比表[阶段序号][2][活动代币性价比表[阶段序号][4].index(序号+1)]]).grid(row=行, column=1, padx=10, pady=2)
+                界面.Label(活动代币性价比域, text=format(100 * [num / max(活动代币性价比表[0][3] + 活动代币性价比表[1][3] + 活动代币性价比表[2][3]) for num in 活动代币性价比表[阶段序号][3]][活动代币性价比表[阶段序号][4].index(序号+1)], '.2f')).grid(row=行, column=2, padx=10, pady=2)
+                行 += 1
+            if 阶段序号 < len(活动商店价格数据.keys())-1:
+                界面.Separator(活动代币性价比域, bootstyle="success").grid(row=行, column=0, columnspan=3, pady=15, sticky=界面.W + E)
+                行 += 1
+
     提示.configure(text='计算完成！', foreground='#78c2ad')
 
 
 名称颜色 = ["black", "YellowGreen", "DodgerBlue", "LightSlateBlue", "GoldenRod"]
 框架颜色 = ["dark", "success", "info", "secondary", "warning"]
-窗口 = 界面.Window(title="罗德岛物价局", themename="minty", iconphoto="图片/标题栏图标.png", size=(1750, 1000), minsize=(0, 0))
+窗口 = 界面.Window(title="罗德岛物价局", themename="minty", iconphoto="图片/标题栏图标.png", size=(1750, 1100), minsize=(0, 0))
 窗口.style.configure('primary.TNotebook', tabposition='wn', tabmargins=0, background='#78c2ad')
 窗口.style.configure('primary.TNotebook.Tab', font=('微软雅黑', 11))
 标签页集 = 界面.Notebook(窗口, style='primary.TNotebook')
@@ -410,13 +438,13 @@ for 序号, 物品 in enumerate(价值输入列表):
 界面.Separator(价值观域, bootstyle="light").grid(row=8, column=0, columnspan=3, pady=5, sticky=界面.W+E)
 源石碎片图标 = ImageTk.PhotoImage(Image.open(f'图片/源石碎片.png').resize((40, 40)))
 界面.Label(价值观域, image=源石碎片图标).grid(row=15, pady=1, column=0, sticky=界面.E)
-界面.Label(价值观域, text="制造源石材料").grid(row=15, column=1, columnspan=2, ipadx=103, pady=5, sticky=界面.W)
-以固源岩为原料 = 界面.BooleanVar(value=TRUE)
-界面.Checkbutton(价值观域, text="以固源岩为原料", variable=以固源岩为原料, onvalue=TRUE, offvalue=FALSE).grid(row=15, pady=5, column=2, padx=5, sticky=界面.W)
+界面.Label(价值观域, text="制造源石材料相关").grid(row=15, column=1, columnspan=2, ipadx=103, pady=5, sticky=界面.W)
+不加工固源岩 = 界面.BooleanVar(value=FALSE)
+界面.Checkbutton(价值观域, text="不加工固源岩", variable=不加工固源岩, onvalue=TRUE, offvalue=FALSE).grid(row=15, pady=5, column=2, padx=5, sticky=界面.W)
 固源岩图标 = ImageTk.PhotoImage(Image.open(f'图片/MTL_SL_G2.png').resize((40, 40)))
 界面.Label(价值观域, image=固源岩图标).grid(row=15, pady=5, column=2, padx=40, sticky=界面.E)
-以装置为原料 = 界面.BooleanVar(value=TRUE)
-界面.Checkbutton(价值观域, text="以装置为原料", variable=以装置为原料, onvalue=TRUE, offvalue=FALSE).grid(row=16, pady=5, column=2, padx=5, sticky=界面.W)
+不加工装置 = 界面.BooleanVar(value=FALSE)
+界面.Checkbutton(价值观域, text="不加工装置", variable=不加工装置, onvalue=TRUE, offvalue=FALSE).grid(row=16, pady=5, column=2, padx=5, sticky=界面.W)
 装置图标 = ImageTk.PhotoImage(Image.open(f'图片/MTL_SL_BOSS2.png').resize((40, 40)))
 界面.Label(价值观域, image=装置图标).grid(row=16, pady=5, column=2, padx=40, sticky=界面.E)
 
@@ -503,21 +531,24 @@ for 等级 in range(5): 精英材料定价域.append(界面.LabelFrame(滚动区
 精英材料定价域[0].grid(row=1, column=3, sticky=界面.W+E+N+S, pady=10, padx=10)
 
 # 采购性价比标签页
+# 活动代币性价比域
+活动代币性价比域 = 界面.LabelFrame(滚动区域[2], text="活动代币", relief=界面.RIDGE, bootstyle="info", borderwidth=10)
 # 信用性价比域
 信用性价比域 = 界面.LabelFrame(滚动区域[2], text="   信用", relief=界面.RIDGE, bootstyle="danger", borderwidth=10)
-信用性价比域.grid(row=0, column=0, sticky=界面.W+E+N+S, pady=10, padx=10)
+信用性价比域.grid(row=0, column=10, sticky=界面.W+E+N+S, pady=10, padx=10)
 # 资质凭证性价比域
 资质凭证性价比域 = 界面.LabelFrame(滚动区域[2], text="资质凭证", relief=界面.RIDGE, bootstyle="success", borderwidth=10)
-资质凭证性价比域.grid(row=0, column=1, sticky=界面.W+E+N+S, pady=10, padx=10)
+资质凭证性价比域.grid(row=0, column=11, sticky=界面.W+E+N+S, pady=10, padx=10)
 # 高级凭证性价比域
 高级凭证性价比域 = 界面.LabelFrame(滚动区域[2], text="高级凭证", relief=界面.RIDGE, bootstyle="warning", borderwidth=10)
-高级凭证性价比域.grid(row=0, column=2, sticky=界面.W+E+N+S, pady=10, padx=10)
+高级凭证性价比域.grid(row=0, column=12, sticky=界面.W+E+N+S, pady=10, padx=10)
 # 寻访参数模型价比域
 寻访参数模型性价比域 = 界面.LabelFrame(滚动区域[2], text="寻访参数模型", relief=界面.RIDGE, bootstyle="danger", borderwidth=10)
-寻访参数模型性价比域.grid(row=0, column=3, sticky=界面.W+E+N+S, pady=10, padx=10)
+寻访参数模型性价比域.grid(row=0, column=13, sticky=界面.W+E+N+S, pady=10, padx=10)
 # 情报凭证性价比域
 情报凭证性价比域 = 界面.LabelFrame(滚动区域[2], text="情报凭证", relief=界面.RIDGE, bootstyle="info", borderwidth=10)
-情报凭证性价比域.grid(row=0, column=4, sticky=界面.W+E+N+S, pady=10, padx=10)
+情报凭证性价比域.grid(row=0, column=14, sticky=界面.W+E+N+S, pady=10, padx=10)
 
+# 更新文件()
 计算工序()
 窗口.mainloop()
