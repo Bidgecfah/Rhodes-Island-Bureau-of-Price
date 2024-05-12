@@ -340,7 +340,7 @@ def 计算工序():
     B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
     活动名称 = "当前无活动"
     for b in B:
-        if "「" in b.text:
+        if "「" in b.text and "生息演算" not in b.text:
             活动名称 = "「" + re.findall(r'\「(.*?)\」', b.text)[0] + "」"
             break
     if 活动名称 != "当前无活动":
