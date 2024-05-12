@@ -38,7 +38,7 @@ def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 
     B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
     活动名称 = "当前无活动"
     for b in B:
-        if "「" in b.text:
+        if "「" in b.text and "生息演算" not in b.text:
             活动名称 = re.findall(r'\「(.*?)\」', b.text)[0]
             break
     PRTS活动网址 = "https://prts.wiki/w/" + 活动名称
@@ -156,7 +156,7 @@ def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 
     for 关卡 in 游戏关卡数据['stages']:
         if 游戏关卡数据['stages'][关卡]['difficulty'] == 'NORMAL':  # 不考虑突袭
             if (游戏关卡数据['stages'][关卡]['stageType'] == 'MAIN' and not 游戏关卡数据['stages'][关卡]['isStoryOnly']
-                    and not 游戏关卡数据['stages'][关卡]['apCost'] == 0):
+                    and not 游戏关卡数据['stages'][关卡]['apCost'] == 0 and not 游戏关卡数据['stages'][关卡]['zoneId'] == 'main_14'):
                 主线关卡信息列表[0].append(关卡)
                 主线关卡信息列表[1].append(游戏关卡数据['stages'][关卡]['apCost'])
                 # 主线关卡信息列表[2].append(游戏关卡数据['stages'][关卡]['goldGain'] * 1.2)
