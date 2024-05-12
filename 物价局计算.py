@@ -34,22 +34,24 @@ def 材料定价计算(输入, 精英材料编号列表, 精英材料名列表, 
     游戏关卡数据 = json.load(open('游戏关卡数据.json'))
     采购价格数据 = json.load(open('采购价格.json', encoding="utf-8"))
     企鹅物流自动掉落数据 = json.load(open('企鹅物流自动掉落数据.json'))
-    PRTS首页 = "https://prts.wiki/w/首页"
-    B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
     活动名称 = "当前无活动"
-    for b in B:
-        if "「" in b.text and "生息演算" not in b.text:
-            活动名称 = re.findall(r'\「(.*?)\」', b.text)[0]
-            break
-    PRTS活动网址 = "https://prts.wiki/w/" + 活动名称
-
-    # 找到含有指定字符串的表格
     商店表格 = None
-    全部表格 = BeautifulSoup(requests.get(PRTS活动网址).text, "html.parser").find_all("table")
-    for 表格 in 全部表格:
-        if "可兑换道具" in 表格.text:
-            商店表格 = 表格
-            break
+    try:
+        PRTS首页 = "https://prts.wiki/w/首页"
+        B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
+        for b in B:
+            if "「" in b.text and "生息演算" not in b.text:
+                活动名称 = re.findall(r'\「(.*?)\」', b.text)[0]
+                break
+        PRTS活动网址 = "https://prts.wiki/w/" + 活动名称
+
+        # 找到含有指定字符串的表格
+        全部表格 = BeautifulSoup(requests.get(PRTS活动网址).text, "html.parser").find_all("table")
+        for 表格 in 全部表格:
+            if "可兑换道具" in 表格.text:
+                商店表格 = 表格
+                break
+    except: pass
 
     # 按照配方构筑加工矩阵
     # 加工T5获得T5精英材料矩阵 = numpy.eye(len(精英材料编号列表[4]))
