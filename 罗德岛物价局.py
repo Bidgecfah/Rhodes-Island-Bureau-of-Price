@@ -336,13 +336,15 @@ def 计算工序():
         界面.Label(情报凭证性价比域, text=情报凭证性价比表[1][情报凭证性价比表[4].index(序号+1)], foreground=名称颜色[情报凭证性价比表[2][情报凭证性价比表[4].index(序号+1)]]).grid(row=序号+1, column=1, padx=10, pady=2)
         界面.Label(情报凭证性价比域, text=format(100 * [num / max(情报凭证性价比表[3]) for num in 情报凭证性价比表[3]][情报凭证性价比表[4].index(序号+1)], '.2f')).grid(row=序号+1, column=2, padx=10, pady=2)
 
-    PRTS首页 = "https://prts.wiki/w/首页"
-    B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
     活动名称 = "当前无活动"
-    for b in B:
-        if "「" in b.text and "生息演算" not in b.text:
-            活动名称 = "「" + re.findall(r'\「(.*?)\」', b.text)[0] + "」"
-            break
+    try:
+        PRTS首页 = "https://prts.wiki/w/首页"
+        B = BeautifulSoup(requests.get(PRTS首页).text, "html.parser").find_all("b")
+        for b in B:
+            if "「" in b.text and "生息演算" not in b.text:
+                活动名称 = "「" + re.findall(r'\「(.*?)\」', b.text)[0] + "」"
+                break
+    except: pass
     if 活动名称 != "当前无活动":
         活动商店价格数据 = json.load(open('活动商店数据.json', encoding="utf-8"))
         活动代币性价比域.grid(row=0, column=0, sticky=界面.W+E+N+S, pady=10, padx=10)
